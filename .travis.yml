@@ -1,0 +1,3 @@
+language: python
+
+script: flake8 ballot

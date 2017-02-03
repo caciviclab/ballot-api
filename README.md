@@ -1,3 +1,6 @@
+[![Build
+Status](https://travis-ci.org/adborden/ballot-api.svg?branch=master)](https://travis-ci.org/adborden/ballot-api)
+
 # Ballot API
 
 This app is inspired by the schema defined in the [Voter Information
