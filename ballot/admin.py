@@ -14,11 +14,7 @@ class PersonAdmin(admin.ModelAdmin):
     exclude = ('filer',)
 
 
-class BallotApiAdminSite(admin.AdminSite):
-    site_header = 'Open Disclosure Ballot API Admin'
-
-
-api_admin = BallotApiAdminSite(name='ballotapi-admin')
-api_admin.register(Election)
-api_admin.register(Person, PersonAdmin)
-api_admin.register(State)
+admin.site.site_header = 'Open Disclosure Ballot API Admin'
+admin.site.register(Election)
+admin.site.register(Person, PersonAdmin)
+admin.site.register(State)

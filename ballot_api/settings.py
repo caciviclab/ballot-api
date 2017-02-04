@@ -18,6 +18,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ballot',
+    'gsheets',
     'rest_framework_swagger',
 )
 
