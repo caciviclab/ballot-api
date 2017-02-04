@@ -15,5 +15,6 @@ schema_view = get_swagger_view(title='Open Disclosure Ballot API')
 urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^$', schema_view),
+    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
     url(r'^admin/', api_admin.urls),
 ]
