@@ -31,7 +31,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'ballot.urls'
+ROOT_URLCONF = 'ballot_api.urls'
 
 TEMPLATES = [
     {
@@ -49,7 +49,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ballot.wsgi.application'
+WSGI_APPLICATION = 'ballot_api.wsgi.application'
 
 DATABASES = {
     'default': {

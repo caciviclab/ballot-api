@@ -2,8 +2,8 @@ from django.conf.urls import url, include
 from rest_framework import routers
 from rest_framework_swagger.views import get_swagger_view
 
-from .admin import api_admin
-from .views import CandidateViewSet, ElectionViewSet
+from ballot.admin import api_admin
+from ballot.views import CandidateViewSet, ElectionViewSet
 
 
 router = routers.DefaultRouter()
