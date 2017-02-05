@@ -1,7 +1,16 @@
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import Candidate, Committee, Referendum, ReferendumMapping
+from .models import Candidate, CandidateAlias, Committee, Referendum, ReferendumMapping
 from .serializers import CandidateSerializer, CommitteeSerializer, ReferendumSerializer, ReferendumMappingSerializer
+
+
+def get_or_none(key, row):
+    value = row.get(key, None)
+    # Convert falsy values to None
+    if not value:
+        value = None
+
+    return value
 
 
 class Parser(object):
@@ -43,11 +52,11 @@ class Parser(object):
     def to_serializer(self, row):
         return self.__class__.serializer(data=row)
 
-    def commit(self, serializer):
-        id = serializer.data.get(self.key)
+    def commit(self, data):
+        id = data.get(self.key)
         kwargs = {
             self.key: id,
-            "defaults": serializer.validated_data
+            "defaults": data
         }
 
         return self.model.objects.update_or_create(**kwargs)
@@ -58,23 +67,54 @@ class CandidateParser(Parser):
     key = 'candidate'
     serializer = CandidateSerializer
 
-    def parse_fields(self, row):
-        """Parses individual fields in the row that are acceptable to the model."""
-        # Convert fppc
-        fppc = row.get('fppc', None)
-        if not fppc:
-            row['fppc'] = None
+    def get_field_names(self):
+        return super(CandidateParser, self).get_field_names() + ['aliases']
 
-        # Parse booleans
-        accepted_expenditure_ceiling = row.get('accepted_expenditure_ceiling', False)
-        row['accepted_expenditure_ceiling'] = bool(accepted_expenditure_ceiling)
+    def parse(self, row):
+        """Parses individual fields in the row that are acceptable to the model."""
+
+        data = self.filter_fields(row)
+
+        # We'll handle aliases below, don't pass them to the eventual model
+        del data['aliases']
+
+        # Convert empty strings to None
+        fppc = get_or_none('fppc', row)
+
+        # Convert empty strings to bool
+        accepted_expenditure_ceiling = bool(row.get('accepted_expenditure_ceiling', False))
 
         # Convert twitter @handle to URL
         twitter = row.get('twitter', None)
         if twitter:
             # Drop the first char (@)
-            row['twitter'] = 'https://twitter.com/%s' % twitter[1:]
+            twitter = 'https://twitter.com/%s' % twitter[1:]
 
+        data.update(
+            fppc=fppc,
+            accepted_expenditure_ceiling=accepted_expenditure_ceiling,
+            twitter=twitter)
+
+        candidate, created = self.commit(data)
+
+        # Parse aliases
+        alias_parser = CandidateAliasParser()
+        candidate_aliases = row.get('aliases', '').split(',')
+        for candidate_alias in candidate_aliases:
+            if not candidate_alias:
+                continue
+
+            alias = alias_parser.parse(dict(candidate_alias=candidate_alias, candidate=candidate))
+            alias_parser.commit(alias)
+
+        return data
+
+
+class CandidateAliasParser(Parser):
+    model = CandidateAlias
+    key = 'candidate_alias'
+
+    def parse(self, row):
         return row
 
 

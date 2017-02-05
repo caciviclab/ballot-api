@@ -1,6 +1,19 @@
 from django.db import models
 
 
+class CandidateAlias(models.Model):
+    """An alternative name for the candidate which may occur in filings."""
+
+    candidate_alias = models.CharField(max_length=30)
+    candidate = models.ForeignKey('Candidate', on_delete=models.CASCADE, related_name='aliases')
+
+    def __str__(self):
+        return self.candidate_alias
+
+    class Meta:
+        verbose_name_plural = 'candidate aliases'
+
+
 class Candidate(models.Model):
     fppc = models.IntegerField(blank=True, null=True, unique=True)
     committee_name = models.CharField(blank=True, max_length=120)

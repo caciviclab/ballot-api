@@ -71,17 +71,18 @@ class Command(BaseCommand):
                         continue
 
                     id = row.get(parser.key)
-                    model = parser.parse(row)
-                    logger.debug(model)
 
-                    serializer = parser.to_serializer(model)
-                    if not serializer.is_valid():
+                    try:
+                        data = parser.parse(row)
+                        logger.debug(data)
+                        model, created = parser.commit(data)
+                    except Exception as err:
                         import_errors += 1
                         logger.error('%s "%s" could not be parsed: parse_errors=%s row=%s',
-                                     parser.name, id, serializer.errors, model)
+                                     parser.name, id, err, row)
+                        logger.exception(err)
                         continue
 
-                    obj, created = parser.commit(serializer)
                     imported += 1
                     if created:
                         logger.info('Created %s "%s"', parser.name, id)
