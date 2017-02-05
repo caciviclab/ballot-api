@@ -17,7 +17,7 @@ class CandidateAlias(models.Model):
 class Candidate(models.Model):
     fppc = models.IntegerField(blank=True, null=True, unique=True)
     committee_name = models.CharField(blank=True, max_length=120)
-    candidate = models.CharField(max_length=30)
+    candidate = models.CharField(max_length=30, help_text='The candidate\'s full name.')
     office = models.CharField(blank=True, max_length=30, help_text='Office the candidate is running for.')
     incumbent = models.BooleanField(default=False)
     accepted_expenditure_ceiling = models.BooleanField(default=False)
