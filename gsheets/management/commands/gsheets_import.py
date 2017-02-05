@@ -8,6 +8,7 @@ import urllib.request
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
 
+from gsheets import parsers
 from gsheets.models import Candidate
 from gsheets.serializers import CandidateSerializer
 
@@ -31,10 +32,25 @@ class Command(BaseCommand):
             default=False,
             help="Import the entity even if it already exists.")
 
-    def handle(self, *args, **options):
-        force = options['force']
+    def format_csv_fields(self, row):
+        """Lowercases the keys of row and removes any special characters"""
 
-        with urllib.request.urlopen(CANDIDATES_SHEET) as request:
+        # Lowercase the keys
+        model = ((k.lower(), v) for k, v in row.items())
+
+        # Replace spaces with underscore
+        model = ((re.sub(r'\s+', '_', k), v) for k, v in model)
+
+        # Strip other characters
+        model = ((re.sub(r'[^a-z_]', '', k), v) for k, v in model)
+
+        return dict(model)
+
+    def handle(self, *args, **options):
+        self.fetch_and_parse_from_url(CANDIDATES_SHEET, parsers.CandidateParser(), **options)
+
+    def fetch_and_parse_from_url(self, url, parser, force=False, **options):
+        with urllib.request.urlopen(url) as request:
             with tempfile.TemporaryFile() as csvfile:
                 csvfile.write(request.read())
                 csvfile.seek(0)
@@ -45,50 +61,31 @@ class Command(BaseCommand):
                 import_errors = 0
                 for row in reader:
                     total += 1
-                    name = row.get('Candidate', None)
-                    if not name:
-                        continue
 
-                    exists = True
-                    try:
-                        Candidate.objects.get(candidate=name)
-                    except ObjectDoesNotExist:
-                        exists = False
+                    row = self.format_csv_fields(row)
+                    logger.debug(row)
 
+                    exists = parser.exists_in_db(row)
                     if exists and not force:
+                        # Skip this row
                         continue
-                    field_names = [field.name for field in Candidate._meta.get_fields()]
-                    model = ((k.lower(), v) for k, v in row.items())
-                    model = ((re.sub(r'\s+', '_', k), v) for k, v in model)
-                    model = ((re.sub(r'[^a-z_]', '', k), v) for k, v in model)
-                    model = dict((k, v) for k, v in model if k in field_names)
 
-                    # Convert fppc
-                    fppc = model.get('fppc', None)
-                    if not fppc:
-                        model['fppc'] = None
-
-                    # Parse booleans
-                    accepted_expenditure_ceiling = model.get('accepted_expenditure_ceiling', False)
-                    model['accepted_expenditure_ceiling'] = bool(accepted_expenditure_ceiling)
-
-                    # Convert twitter @handle to URL
-                    twitter = model.get('twitter', None)
-                    if twitter:
-                        # Drop the first char (@)
-                        model['twitter'] = 'https://twitter.com/%s' % twitter[1:]
-
+                    model = parser.parse(row)
                     logger.debug(model)
-                    serializer = CandidateSerializer(data=model)
+
+                    serializer = parser.to_serializer(model)
                     if not serializer.is_valid():
                         import_errors += 1
-                        logger.error('Candidate could not be parsed: name="%s" parse_errors=%s row=%s',
-                                     name, serializer.errors, model)
+                        logger.error('%s could not be parsed: parse_errors=%s row=%s',
+                                     parser.name(), serializer.errors, model)
                         continue
 
-                    Candidate.objects.update_or_create(candidate=name, defaults=serializer.validated_data)
+                    obj, created = parser.commit(serializer)
                     imported += 1
-                    logger.info('Imported candidate "%s"' % name)
+                    if created:
+                        logger.info('Created %s', parser.name())
+                    else:
+                        logger.info('Updated %s', parser.name())
 
                 logger.info('Import candidates complete: total=%s imported=%s errors=%s',
                             total, imported, import_errors)
