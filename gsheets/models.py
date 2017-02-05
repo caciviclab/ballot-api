@@ -23,10 +23,13 @@ class Candidate(models.Model):
 
 class Referendum(models.Model):
     measure_number = models.CharField(max_length=5)
-    short_title = models.CharField(blank=True, max_length=30)
+    short_title = models.CharField(blank=True, max_length=200)
     full_title = models.TextField(blank=True)
     summary = models.TextField()
     votersedge = models.URLField(blank=True, null=True)
+
+    def __str__(self):
+        return "Referendum %s %s" % (self.measure_number, self.short_title)
 
 
 class Committee(models.Model):

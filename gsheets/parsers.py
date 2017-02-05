@@ -1,7 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import Candidate, Committee
-from .serializers import CandidateSerializer, CommitteeSerializer
+from .models import Candidate, Committee, Referendum
+from .serializers import CandidateSerializer, CommitteeSerializer, ReferendumSerializer
 
 
 class Parser(object):
@@ -95,3 +95,9 @@ class CommitteeParser(Parser):
         )
 
         return parsed
+
+
+class ReferendumParser(Parser):
+    model = Referendum
+    key = 'measure_number'
+    serializer = ReferendumSerializer
