@@ -11,6 +11,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = (
     'flat',
     'django.contrib.admin',
+    'django.contrib.admindocs',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -21,6 +22,7 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.contrib.admindocs.middleware.XViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -31,7 +33,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'ballot.urls'
+ROOT_URLCONF = 'ballot_api.urls'
 
 TEMPLATES = [
     {
@@ -49,7 +51,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ballot.wsgi.application'
+WSGI_APPLICATION = 'ballot_api.wsgi.application'
 
 DATABASES = {
     'default': {
