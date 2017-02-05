@@ -3,11 +3,13 @@ from django.contrib import admin
 from rest_framework import routers
 from rest_framework_swagger.views import get_swagger_view
 
-from ballot.views import CandidateViewSet, ElectionViewSet
+import ballot.views as ballot_views
+import gsheets.views as gsheets_views
 
-router = routers.DefaultRouter()
-router.register(r'candidates', CandidateViewSet)
-router.register(r'elections', ElectionViewSet)
+router = routers.SimpleRouter()
+#router.register(r'candidates', ballot_views.CandidateViewSet)
+router.register(r'elections', ballot_views.ElectionViewSet)
+router.register(r'candidates', gsheets_views.CandidateViewSet)
 
 schema_view = get_swagger_view(title='Open Disclosure Ballot API')
 

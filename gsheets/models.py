@@ -3,21 +3,22 @@ from django.db import models
 
 class Candidate(models.Model):
     fppc = models.IntegerField(blank=True, null=True, unique=True)
-    committee_name = models.CharField(max_length=60)
+    committee_name = models.CharField(blank=True, max_length=120)
     candidate = models.CharField(max_length=30)
-    aliases = models.TextField(
-            blank=True,
-            help_text='Comma separated list of alternative spellings and names within the filings.')
     office = models.CharField(blank=True, max_length=30, help_text='Office the candidate is running for.')
-    incumbent = models.BooleanField()
-    accepted_expenditure_ceiling = models.BooleanField()
+    incumbent = models.BooleanField(default=False)
+    accepted_expenditure_ceiling = models.BooleanField(default=False)
     website = models.URLField(blank=True, null=True)
     twitter = models.URLField(blank=True, null=True)
     party_affiliation = models.CharField(blank=True, max_length=15)
-    occupation = models.CharField(blank=True, max_length=30)
+    occupation = models.CharField(blank=True, max_length=80)
     bio = models.TextField(blank=True)
-    photo = models.ImageField(blank=True, null=True)
+    # TODO use ImageField to support photo uploads
+    photo = models.URLField(blank=True, null=True)
     votersedge = models.URLField(blank=True, null=True)
+
+    def __str__(self):
+        return self.candidate
 
 
 class Referendum(models.Model):
