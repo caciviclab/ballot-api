@@ -40,16 +40,19 @@ class Committee(models.Model):
         ('O', 'Oppose'),
     ]
 
-    filer_id = models.IntegerField()
-    filer_naml = models.CharField(blank=True, max_length=20)
+    filer_id = models.CharField(max_length=15)
+    filer_naml = models.CharField(blank=True, max_length=200)
     committee_type = models.CharField(blank=True, max_length=3, choices=COMMITTEE_TYPES)
-    description = models.CharField(blank=True, max_length=20)
+    description = models.CharField(blank=True, max_length=40)
     ballot_measure = models.CharField(blank=True, max_length=3)
     support_or_oppose = models.CharField(blank=True, max_length=1, choices=SUPPORT_OPPOSE)
     website = models.URLField(blank=True, null=True)
     twitter = models.URLField(blank=True, null=True)
     facebook = models.URLField(blank=True, null=True)
     netfilelocalid = models.CharField(blank=True, max_length=15)
+
+    def __str__(self):
+        return self.filer_naml
 
 
 class ReferendumMapping(models.Model):

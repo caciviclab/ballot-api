@@ -1,12 +1,13 @@
 from django.core.exceptions import ObjectDoesNotExist
 
-from .models import Candidate
-from .serializers import CandidateSerializer
+from .models import Candidate, Committee
+from .serializers import CandidateSerializer, CommitteeSerializer
 
 
 class Parser(object):
+    @property
     def name(self):
-        return self.__class__.model.__name__
+        return self.model.__name__
 
     def filter_fields(self, row):
         field_names = self.get_field_names()
@@ -15,27 +16,47 @@ class Parser(object):
     def parse(self, row):
         return self.parse_fields(self.filter_fields(row))
 
+    def parse_fields(self, row):
+        """Subclasses should override this method to transform the row to appropriate types"""
 
-class CandidateParser(Parser):
-    model = Candidate
+        return row
 
-    def key(self, row):
-        return row.get('candidate', None)
+    def get_field_names(self):
+        return [field.name for field in self.model._meta.get_fields()]
 
     def exists_in_db(self, row):
         """Determines if this row exists in the database already."""
 
-        name = row.get('candidate', None)
-        if not name:
+        id = row.get(self.key, None)
+        if not id:
             return False
 
+        kwargs = {self.key: id}
         exists = True
         try:
-            Candidate.objects.get(candidate=name)
+            self.model.objects.get(**kwargs)
         except ObjectDoesNotExist:
             exists = False
 
         return exists
+
+    def to_serializer(self, row):
+        return self.__class__.serializer(data=row)
+
+    def commit(self, serializer):
+        id = serializer.data.get(self.key)
+        kwargs = {
+            self.key: id,
+            "defaults": serializer.validated_data
+        }
+
+        return self.model.objects.update_or_create(**kwargs)
+
+
+class CandidateParser(Parser):
+    model = Candidate
+    key = 'candidate'
+    serializer = CandidateSerializer
 
     def parse_fields(self, row):
         """Parses individual fields in the row that are acceptable to the model."""
@@ -56,11 +77,21 @@ class CandidateParser(Parser):
 
         return row
 
-    def get_field_names(self):
-        return [field.name for field in Candidate._meta.get_fields()]
 
-    def to_serializer(self, row):
-        return CandidateSerializer(data=row)
+class CommitteeParser(Parser):
+    model = Committee
+    key = 'filer_id'
+    serializer = CommitteeSerializer
 
-    def commit(self, serializer):
-        return Candidate.objects.update_or_create(candidate=serializer.data.get('candidate'), defaults=serializer.validated_data)
+    def parse_fields(self, row):
+        twitter = row.get('twitter', None)
+        if twitter:
+            # Drop the first char (@)
+            twitter = 'https://twitter.com/%s' % twitter[1:]
+
+        parsed = dict(row)
+        parsed.update(
+            twitter=twitter,
+        )
+
+        return parsed

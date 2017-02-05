@@ -5,12 +5,9 @@ import re
 import tempfile
 import urllib.request
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
 
 from gsheets import parsers
-from gsheets.models import Candidate
-from gsheets.serializers import CandidateSerializer
 
 
 CANDIDATES_SHEET = 'https://docs.google.com/spreadsheets/d/1272oaLyQhKwQa6RicA5tBso6wFruum-mgrNm3O3VogI/pub?gid=0&single=true&output=csv' # noqa
@@ -48,6 +45,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.fetch_and_parse_from_url(CANDIDATES_SHEET, parsers.CandidateParser(), **options)
+        self.fetch_and_parse_from_url(COMMITTEES_SHEET, parsers.CommitteeParser(), **options)
 
     def fetch_and_parse_from_url(self, url, parser, force=False, **options):
         with urllib.request.urlopen(url) as request:
@@ -70,22 +68,23 @@ class Command(BaseCommand):
                         # Skip this row
                         continue
 
+                    id = row.get(parser.key)
                     model = parser.parse(row)
                     logger.debug(model)
 
                     serializer = parser.to_serializer(model)
                     if not serializer.is_valid():
                         import_errors += 1
-                        logger.error('%s could not be parsed: parse_errors=%s row=%s',
-                                     parser.name(), serializer.errors, model)
+                        logger.error('%s "%s" could not be parsed: parse_errors=%s row=%s',
+                                     parser.name, id, serializer.errors, model)
                         continue
 
                     obj, created = parser.commit(serializer)
                     imported += 1
                     if created:
-                        logger.info('Created %s', parser.name())
+                        logger.info('Created %s "%s"', parser.name, id)
                     else:
-                        logger.info('Updated %s', parser.name())
+                        logger.info('Updated %s "%s"', parser.name, id)
 
-                logger.info('Import candidates complete: total=%s imported=%s errors=%s',
-                            total, imported, import_errors)
+                logger.info('Import %s data complete: total=%s imported=%s errors=%s',
+                            parser.name, total, imported, import_errors)

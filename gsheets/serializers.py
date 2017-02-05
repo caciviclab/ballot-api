@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Candidate
+from .models import Candidate, Committee
 
 
 class CandidateSerializer(serializers.ModelSerializer):
@@ -7,4 +7,11 @@ class CandidateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Candidate
+        fields = '__all__'
+
+
+class CommitteeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Committee
         fields = '__all__'
