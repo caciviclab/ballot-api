@@ -47,6 +47,7 @@ class Command(BaseCommand):
         self.fetch_and_parse_from_url(CANDIDATES_SHEET, parsers.CandidateParser(), **options)
         self.fetch_and_parse_from_url(COMMITTEES_SHEET, parsers.CommitteeParser(), **options)
         self.fetch_and_parse_from_url(REFERENDUMS_SHEET, parsers.ReferendumParser(), **options)
+        self.fetch_and_parse_from_url(REFERENDUM_NAME_TO_NUMBER_SHEET, parsers.ReferendumMappingParser(), **options)
 
     def fetch_and_parse_from_url(self, url, parser, force=False, **options):
         with urllib.request.urlopen(url) as request:

@@ -59,5 +59,5 @@ class Committee(models.Model):
 
 
 class ReferendumMapping(models.Model):
-    measure_name = models.CharField(max_length=30)
+    measure_name = models.CharField(max_length=200)
     measure_number = models.CharField(max_length=3)
