@@ -67,8 +67,17 @@ class CandidateParser(Parser):
     key = 'candidate'
     serializer = CandidateSerializer
 
-    def get_field_names(self):
-        return super(CandidateParser, self).get_field_names() + ['aliases']
+    def parse_party_affiliation(self, row):
+        party_affiliation = row.get('party_affiliation', None)
+        if not party_affiliation:
+            return 'O'
+
+        # Take only the first character
+        party_affiliation = party_affiliation[0]
+        if party_affiliation not in [k for k, _ in Candidate.PARTY_AFFILIATION]:
+            return 'O'
+
+        return party_affiliation
 
     def parse(self, row):
         """Parses individual fields in the row that are acceptable to the model."""
@@ -84,6 +93,9 @@ class CandidateParser(Parser):
         # Convert empty strings to bool
         accepted_expenditure_ceiling = bool(row.get('accepted_expenditure_ceiling', False))
 
+        # Party affiliation
+        party_affiliation = self.parse_party_affiliation(row)
+
         # Convert twitter @handle to URL
         twitter = row.get('twitter', None)
         if twitter:
@@ -93,6 +105,7 @@ class CandidateParser(Parser):
         data.update(
             fppc=fppc,
             accepted_expenditure_ceiling=accepted_expenditure_ceiling,
+            party_affiliation=party_affiliation,
             twitter=twitter)
 
         candidate, created = self.commit(data)

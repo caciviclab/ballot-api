@@ -15,6 +15,15 @@ class CandidateAlias(models.Model):
 
 
 class Candidate(models.Model):
+    """A person running for office in an election."""
+
+    PARTY_AFFILIATION = [
+        ('D', 'Democrat'),
+        ('R', 'Republican'),
+        ('I', 'Independent'),
+        ('O', 'Other'),
+    ]
+
     fppc = models.IntegerField(blank=True, null=True, unique=True)
     committee_name = models.CharField(blank=True, max_length=120)
     candidate = models.CharField(max_length=30, help_text='The candidate\'s full name.')
@@ -23,7 +32,7 @@ class Candidate(models.Model):
     accepted_expenditure_ceiling = models.BooleanField(default=False)
     website = models.URLField(blank=True, null=True)
     twitter = models.URLField(blank=True, null=True)
-    party_affiliation = models.CharField(blank=True, max_length=15)
+    party_affiliation = models.CharField(blank=True, max_length=1, choices=PARTY_AFFILIATION)
     occupation = models.CharField(blank=True, max_length=80)
     bio = models.TextField(blank=True)
     # TODO use ImageField to support photo uploads
@@ -73,4 +82,7 @@ class Committee(models.Model):
 
 class ReferendumMapping(models.Model):
     measure_name = models.CharField(max_length=200)
-    measure_number = models.CharField(max_length=3)
+    measure_number = models.CharField(max_length=10)
+
+    def __str__(self):
+        return '%s: %s' % (self.measure_number, self.measure_name)
