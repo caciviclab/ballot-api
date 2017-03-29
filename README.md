@@ -9,6 +9,8 @@ California.
 
 ## Prequisites
 
+- [PostgreSQL](https://www.postgresql.org/)
+
 
 ## Setup
 
