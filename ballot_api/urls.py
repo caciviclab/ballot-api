@@ -7,7 +7,6 @@ import ballot.views as ballot_views
 import gsheets.views as gsheets_views
 
 router = routers.SimpleRouter()
-#router.register(r'candidates', ballot_views.CandidateViewSet)
 router.register(r'elections', ballot_views.ElectionViewSet)
 router.register(r'candidates', gsheets_views.CandidateViewSet)
 
