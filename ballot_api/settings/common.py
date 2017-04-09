@@ -30,7 +30,7 @@ INSTALLED_APPS = (
     'rest_framework_swagger',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.admindocs.middleware.XViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

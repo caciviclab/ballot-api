@@ -1,6 +1,6 @@
 coreapi==2.1.1
 dj-database-url==0.4.2
-Django==1.8
+Django==1.11
 django-flat-theme==1.1.4
 django-rest-swagger==2.1.1
 djangorestframework==3.5.3
