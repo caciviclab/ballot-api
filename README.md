@@ -9,6 +9,7 @@ California.
 
 ## Prequisites
 
+- Python 3
 - [PostgreSQL](https://www.postgresql.org/)
 
 
