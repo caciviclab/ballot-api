@@ -2,4 +2,14 @@ language: python
 python:
   - 3.6
 
-script: flake8
+script:
+  - flake8
+  - python manage.py test
+
+deploy:
+  provider: heroku
+  app: caciviclab-ballot-api
+  run: python manage.py migrate
+  on: master
+  api_key:
+    secure: "FE+fi/wY2+LfPP2WZW1Tvvw24+ijldCr7BqIzeeHtKIdu8QK5WOhgdZ8rgkUXtoeGWx3j9vvGeaRCdmQr06kfJ2qk8dsidKSxiAPu3uvL4ppGwqhB+EqgDdMNoUKvStYeBdSNYOpytWYUOdKMu6DPUGwMxGQwItwmtNAHYTZ4ciTno6sdIaFi0/UXoPixGAgvxR+VzgNANy6+86Kl4dO9LMAHmeaPPebmQFOV4WvutEoryHsPklOJHDFEBcUnqRA1YK1FPPZ9Fpy88ZPF6Alx8O0f5B3TxadSgtEqgTMp7FGkpcGE9dh4/Tb6MESm/6l3EANNEEMs9iCqpvA3dboTcSqUkb7yqbEqt5Th5pB/gWxthgvlM25EiE/hCa36jB8kUAO/XjaH1QKBr7SwtvywzDdW4Xn5JXlsunQa3eW/GDUV4oADwRjGjq6kqQADj+FX19jLMR+NhBjZvJ4qQx43wSz8yKBWURl/oN/9B2YuEJJ//OtA8mEtLtL0vphiNXp4T6w/RcVL8hj5Jfe61ULgfX51QwRjbnzXJf0JurvfOZJBbO48K8ZPv0u1FTZ7Bn2QjSGo/bha+IHwUyqjaBEudrpbShE+BQ+YNcBOB2YnR0Zgi1n4snO1uZ3+V0HirtTsiHfDJdSA07l8jDWW4x9lbDFTmXEA6UwYOsOohTwZgc="
