@@ -1,4 +1,7 @@
+import logging
 import os
+
+logging.basicConfig(level=logging.INFO)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -18,6 +21,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'ballot',
+    'gsheets',
     'rest_framework_swagger',
 )
 
