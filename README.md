@@ -36,11 +36,12 @@ The ballot-api can easily be deployed to Heroku. After creating an initial app
 in Heroku, you'll want to set these environment variables. `DATABASE_URL` should
 be set automatically after enabling the PostgreSQL add-on.
 
-Env | Description | Example
-`ALLOWED_HOSTS` | Comma-separated list of host names for the app | caciviclab-ballot-api.herokuapp.com
-`DATABASE_URL` | [Database connection URL](https://pypi.python.org/pypi/dj-database-url) (set by PostgreSQL add-on) |  postgresql://user:password@hostname:port/database_name?options
-`DJANGO_SETTINGS_MODULE` | Settings module to use for Django | ballot_api.settings.heroku
-`SECRET_KEY` | Django secret key | a-random-string-of-50-characters
+| Environment variable     | Description | Example |
+| ------------------------ | ----------- | ------- |
+| `ALLOWED_HOSTS`          | Comma-separated list of host names for the app | caciviclab-ballot-api.herokuapp.com |
+| `DATABASE_URL`           | [Database connection URL](https://pypi.python.org/pypi/dj-database-url) (set by PostgreSQL add-on) |  postgresql://user:password@hostname:port/database_name?options |
+| `DJANGO_SETTINGS_MODULE` | Settings module to use for Django | ballot_api.settings.heroku |
+| `SECRET_KEY`             | Django secret key | a-random-string-of-50-characters |
 
 
 ### Continuous deployment
