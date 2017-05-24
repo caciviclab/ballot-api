@@ -12,7 +12,7 @@ DEBUG = False
 if 'ALLOWED_HOSTS' not in os.environ:
     raise Exception('ALLOWED_HOSTS environment variable must be set to a comma-separated list of host names for heroku configuration.')
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', ['*'])
 
 
 if 'DATABASE_URL' not in os.environ:
